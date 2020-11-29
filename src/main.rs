@@ -1,41 +1,27 @@
 use std::vec::Vec;
-pub enum Stage<'a> {
-    Radial(RadialStage<'a>),
+use winit;
+pub struct RefStruct<'a> {
+    pub mref: &'a u32,
 }
 
-pub struct StageData<'a> {
-    pub input_texture: &'a wgpu::Texture,
-}
-
-pub struct RadialStage<'a> {
-    pub stage_data: StageData<'a>,
-}
-
-fn create_textures() -> Vec<wgpu::Texture> {
-    let input_texture: wgpu::Texture;
-    let intermediate_texture: wgpu::Texture;
-    vec![input_texture, intermediate_texture]
-}
-
-fn create_stages<'a>(
-    textures: &'a Vec<wgpu::Texture>,
-    texture_views: &'a Vec<wgpu::TextureView>,
-) -> Vec<Stage<'a>> {
-    let mut stages = Vec::<Stage>::new();
-    stages
+fn create_rstruct_vec<'a>(vec: &'a Vec<u32>) -> Vec<RefStruct<'a>> {
+    let mut rstruct_vec = Vec::<RefStruct>::new();
+    for num in vec {
+        rstruct_vec.push(RefStruct { mref: &num });
+    }
+    rstruct_vec
 }
 
 fn main() {
     let event_loop = winit::event_loop::EventLoop::new();
+    let vec = vec![1, 2];
+    //let rstruct_vec = create_rstruct_vec(&vec);
 
-    let textures = create_textures();
-    let texture_views: Vec<wgpu::TextureView>;
-    let stages = create_stages(&textures, &texture_views);
-
-    event_loop.run(move |event, _, control_flow| {
-        // Have the closure take ownership of the resources.
-        // `event_loop.run` never returns, therefore we must do this to ensure
-        // the resources are properly cleaned up.
-        let _ = (&textures, &texture_views, &stages);
+    event_loop.run(move |_event, _, _control_flow| {
+        let rstruct_vec = create_rstruct_vec(&vec);
+        let _ = (&vec, &rstruct_vec);
+        for r in rstruct_vec {
+            print!("{}", r.mref);
+        }
     });
 }
